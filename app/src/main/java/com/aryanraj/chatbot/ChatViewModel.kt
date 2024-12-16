@@ -20,46 +20,9 @@ class ChatViewModel : ViewModel() {
     fun onEvent(event: ChatUiEvent) {
         when (event) {
             is ChatUiEvent.SendPrompt -> {
-                if (event.prompt.isNotEmpty()) {
-                    addPrompt(event.prompt, event.bitmap)
-
-                    if (event.bitmap != null) {
-                        getResponseWithImage(event.prompt, event.bitmap)
-                    } else {
-                        getResponse(event.prompt)
-                    }
+                if (event.bitmap != null) {
+                    getResponseWithImage(event.prompt, event.bitmap)
                 }
-            }
-
-            is ChatUiEvent.UpdatePrompt -> {
-                _chatState.update {
-                    it.copy(prompt = event.newPrompt)
-                }
-            }
-        }
-    }
-
-    private fun addPrompt(prompt: String, bitmap: Bitmap?) {
-        _chatState.update {
-            it.copy(
-                chatList = it.chatList.toMutableList().apply {
-                    add(0, Chat(prompt, bitmap, true))
-                },
-                prompt = "",
-                bitmap = null
-            )
-        }
-    }
-
-    private fun getResponse(prompt: String) {
-        viewModelScope.launch {
-            val chat = ChatData.getResponse(prompt)
-            _chatState.update {
-                it.copy(
-                    chatList = it.chatList.toMutableList().apply {
-                        add(0, chat)
-                    }
-                )
             }
         }
     }

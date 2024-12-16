@@ -9,40 +9,23 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddPhotoAlternate
-import androidx.compose.material.icons.rounded.Send
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.paint
-import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -57,20 +40,21 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
-import com.aryanraj.chatbot.ui.theme.BackgroundImageChangingScreen
+import com.aryanraj.chatbot.ui.theme.Black
+
 import com.aryanraj.chatbot.ui.theme.ChatBotTheme
-import com.aryanraj.chatbot.ui.theme.ColorCode1
-import com.aryanraj.chatbot.ui.theme.ColorCode2
 import com.aryanraj.chatbot.ui.theme.DarkGrey
 import com.aryanraj.chatbot.ui.theme.DarkTeal
-import com.aryanraj.chatbot.ui.theme.PurpleDark
 import com.aryanraj.chatbot.ui.theme.Teal
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
 class MainActivity : ComponentActivity() {
 
-    private val uriState = MutableStateFlow("")
+
+    private val uriState = MutableStateFlow<String>("")
+    private val captionState = MutableStateFlow("")
 
     private val imagePicker =
         registerForActivityResult<PickVisualMediaRequest, Uri>(
@@ -78,8 +62,10 @@ class MainActivity : ComponentActivity() {
         ) { uri ->
             uri?.let {
                 uriState.update { uri.toString() }
+                captionState.update { "" } // Reset caption when a new image is picked
             }
         }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -96,28 +82,29 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun TopBar(){
+    fun TopBar() {
         Scaffold(
             topBar = {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Teal)
+                        .background(Color(77,73,158,255))
                         .height(50.dp)
-                        .padding(horizontal = 16.dp,)
+                        .padding(horizontal = 16.dp)
                         .padding(top = 5.dp)
                 ) {
-                    Row(horizontalArrangement = Arrangement.Center,
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                    )
-                    {
-                        Image(painter = painterResource(id = R.drawable.chatbot_12441094),
-                            contentDescription = "Icon Image",
-                            modifier = Modifier.padding(5.dp))
+                        modifier = Modifier.align(Alignment.TopStart)
+                    ) {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.chatbot_12441094),
+//                            contentDescription = "Icon Image",
+//                            modifier = Modifier.padding(5.dp)
+//                        )
                         Text(
-                            text = "AI ChatBot",
+                            text = "LUMI",
                             fontSize = 22.sp,
                             color = White,
                             fontWeight = FontWeight.ExtraBold
@@ -128,14 +115,12 @@ class MainActivity : ComponentActivity() {
         ) {
             ChatScreen(paddingValues = it)
         }
-
     }
-    @OptIn(ExperimentalMaterial3Api::class)
+
     @Composable
     fun ChatScreen(paddingValues: PaddingValues) {
         val chaViewModel = viewModel<ChatViewModel>()
         val chatState = chaViewModel.chatState.collectAsState().value
-
         val bitmap = getBitmap()
 
         Column(
@@ -180,99 +165,34 @@ class MainActivity : ComponentActivity() {
                             bitmap = it.asImageBitmap()
                         )
                     }
-                    Icon(
-                        modifier = Modifier
-                            .size(35.dp)
-                           // .padding(3.dp)
-                            .clickable {
-                                imagePicker.launch(
-                                    PickVisualMediaRequest
-                                        .Builder()
-                                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                        .build()
-                                )
-                            },
-                        imageVector = Icons.Rounded.AddPhotoAlternate,
-                        contentDescription = "Add Photo",
-                        tint = Teal
-                    )
-                }
-                Spacer(modifier = Modifier.width(6.dp))
-                OutlinedTextField(
-                    modifier = Modifier
-                        .weight(1f),
-                    value = chatState.prompt,
-                    shape = RoundedCornerShape(9.dp),
-                    onValueChange = {
-                        chaViewModel.onEvent(ChatUiEvent.UpdatePrompt(it))
-                    },
-                    placeholder = {
-                        Text(text = "Reveal your hidden wishes.")
+
+        Icon(
+            modifier = Modifier
+                .size(35.dp)
+                .clickable {
+                    if (bitmap != null) {
+                        // Trigger the caption retrieval when image is selected
+                        chaViewModel.onEvent(
+                            ChatUiEvent.SendPrompt(
+                                "Generate caption for this image in a single line and the start the caption with the word Start and Finish it with End",
+                                bitmap
+                            )
+                        )
+                    } else {
+                        imagePicker.launch(
+                            PickVisualMediaRequest
+                                .Builder()
+                                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                .build()
+                        )
                     }
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Icon(
-                    modifier = Modifier
-                        .size(35.dp)
-                        .clickable {
-                            chaViewModel.onEvent(ChatUiEvent.SendPrompt(chatState.prompt, bitmap))
-                            uriState.update { "" }
-                        },
-                    imageVector = Icons.Rounded.Send,
-                    contentDescription = "Send prompt",
-                    tint = Teal
-                )
+                },
+            imageVector = Icons.Rounded.AddPhotoAlternate,
+            contentDescription = if (bitmap != null) "Get Caption" else "Add Photo",
+            tint = Color(77, 73, 158, 255)
+        )
+                }
             }
-        }
-    }
-
-    @Composable
-    fun UserChatItem(prompt: String, bitmap: Bitmap?) {
-        Column(
-            modifier = Modifier.padding(start = 100.dp, bottom = 16.dp)
-        ) {
-            bitmap?.let {
-                Image(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(260.dp)
-                        .padding(bottom = 2.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    contentDescription = "image",
-                    contentScale = ContentScale.Crop,
-                    bitmap = it.asImageBitmap()
-                )
-            }
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(DarkGrey)
-                    .padding(16.dp),
-                text = prompt,
-                fontSize = 17.sp,
-                color = White
-            )
-        }
-    }
-
-    @Composable
-    fun ModelChatItem(response: String) {
-        Column(
-            modifier = Modifier.padding(end = 100.dp, bottom = 16.dp)
-        ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(DarkTeal)
-                    .padding(16.dp),
-                text = response,
-                fontSize = 17.sp,
-                color = White
-            )
         }
     }
 
@@ -291,4 +211,58 @@ class MainActivity : ComponentActivity() {
         }
         return null
     }
+
+    @Composable
+    fun UserChatItem(prompt: String, bitmap: Bitmap?) {
+        Column(
+            modifier = Modifier
+                .padding(start = 100.dp, bottom = 16.dp)
+        ) {
+
+            bitmap?.let {
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(260.dp)
+                        .padding(bottom = 2.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentDescription = "Image",
+                    contentScale = ContentScale.Crop,
+                    bitmap = it.asImageBitmap() // Display the image
+                )
+            }
+
+
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(77, 73, 158, 255))
+                    .padding(16.dp),
+                text = prompt,
+                fontSize = 17.sp,
+                color = White
+            )
+        }
+    }
+    @Composable
+    fun ModelChatItem(response: String) {
+        Column(
+            modifier = Modifier
+                .padding(end = 100.dp, bottom = 16.dp)
+        ) {
+            // Display the model's response (caption)
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(77, 73, 158, 255))
+                    .padding(16.dp),
+                text = response,
+                fontSize = 17.sp,
+                color = White
+            )
+        }
+    }
+
 }
