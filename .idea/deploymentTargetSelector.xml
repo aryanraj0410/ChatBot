@@ -4,11 +4,11 @@
     <selectionStates>
       <SelectionState runConfigName="App">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-12T07:03:18.134857500Z">
+        <DropdownSelection timestamp="2025-02-17T04:55:24.327612800Z">
           <Target type="DEFAULT_BOOT">
-            <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\ranja\.android\avd\Medium_Phone_API_35.avd" />
-            </handle>
+            <template>
+              <DeviceId pluginId="FirebaseDirectAccess" type="TEMPLATE" identifier="model_id=caiman/34" />
+            </template>
           </Target>
         </DropdownSelection>
         <DialogSelection />
