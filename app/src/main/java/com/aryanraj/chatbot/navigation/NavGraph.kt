@@ -4,7 +4,7 @@
 //import androidx.navigation.compose.NavHost
 //import androidx.navigation.compose.composable
 //import androidx.navigation.compose.rememberNavController
-//import com.aryanraj.chatbot.WelcomeScreen
+//import com.aryanraj.chatbot.screens.WelcomeScreen
 //
 //
 //@Composable

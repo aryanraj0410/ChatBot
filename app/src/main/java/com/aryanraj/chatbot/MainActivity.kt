@@ -174,7 +174,7 @@ class MainActivity : ComponentActivity() {
                         // Trigger the caption retrieval when image is selected
                         chaViewModel.onEvent(
                             ChatUiEvent.SendPrompt(
-                                "Generate caption for this image in a single line and the start the caption with the word Start and Finish it with End",
+                                "in the given image tell if the food is spoiled and if not give the general time to spoil for the specific food item",
                                 bitmap
                             )
                         )
@@ -251,7 +251,7 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier
                 .padding(end = 100.dp, bottom = 16.dp)
         ) {
-            // Display the model's response (caption)
+
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
