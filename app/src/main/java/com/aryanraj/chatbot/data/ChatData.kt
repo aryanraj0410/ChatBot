@@ -16,7 +16,7 @@
 
         suspend fun getResponse(prompt: String): Chat {
             val generativeModel = GenerativeModel(
-                modelName = "gemini-1.5-flash", apiKey = apiKey
+                                                                                                                                                                                                                                                                 modelName = "gemini-1.5-flash", apiKey = apiKey
             )
 
             try {

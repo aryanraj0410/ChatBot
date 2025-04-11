@@ -17,18 +17,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.aryanraj.chatbot.R
+import com.aryanraj.chatbot.ui.theme.limegreen
 import com.aryanraj.chatbot.ui.theme.lumicolor
+import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.NavController
+
 
 @Composable
-fun WelcomeScreen() {
+fun GetStarted(navController: NavController) {
     Column( modifier = Modifier
-        .background(Color.Black)
+        .background(limegreen)
         .fillMaxSize()
         .padding(40.dp)) {
 
         Box(
-        modifier = Modifier
-            .background(Color.Black),
+        modifier = Modifier,
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -46,34 +49,36 @@ fun WelcomeScreen() {
 
         }
     }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(25.dp))
         Column {
             Text(
-                text = "Start a new chat with",
+                text = "LUMI is a MRI Image classification tool, that can be used for medical purposes.",
                 color = Color.White,
-                fontSize = 35.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center
+
             )
-            Text(
-                text = "LUMI",
-                color = lumicolor,
-                fontSize = 35.sp,
-                fontWeight = FontWeight.ExtraBold,
-                fontStyle = FontStyle.Italic
-            )
+//            Text(
+//                text = "LUMI",
+//                color = lumicolor,
+//                fontSize = 35.sp,
+//                fontWeight = FontWeight.ExtraBold,
+//                fontStyle = FontStyle.Italic
+//            )
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         CustomButton(
-            buttonText = "Get Started",
-            textColor = lumicolor,
+            buttonText = "Ok, I'll take this now →",
+            textColor = limegreen,
             textSize = 20,
-            onClick = { /* Handle click */ }
+            onClick = { navController.navigate("MainScreen") }
         )
+
 
     }
 }
-
 @Composable
 fun CustomButton(
     buttonText: String,
@@ -86,7 +91,7 @@ fun CustomButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White
         ),
-        modifier = Modifier.padding(top = 35.dp, bottom = 45.dp)
+        modifier = Modifier.padding(top = 10.dp, bottom = 20.dp)
             .fillMaxSize()
     ) {
         Text(
@@ -98,8 +103,3 @@ fun CustomButton(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewWelcomeScreen() {
-    WelcomeScreen()
-}
