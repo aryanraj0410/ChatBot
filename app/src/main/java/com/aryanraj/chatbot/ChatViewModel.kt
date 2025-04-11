@@ -26,7 +26,6 @@ class ChatViewModel : ViewModel() {
             }
         }
     }
-
     private fun getResponseWithImage(prompt: String, bitmap: Bitmap) {
         viewModelScope.launch {
             val chat = ChatData.getResponseWithImage(prompt, bitmap)
